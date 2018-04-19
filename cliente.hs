@@ -1,31 +1,40 @@
 import System.IO
 import Data.List.Split
 
+type Codigo = Integer
 type Nome = String
-type Idade = Int
-type Pessoa = (Nome, Idade)
+type Cidade = String
+type Idade = Integer
+type Sexo = Char
+type Cliente = (Codigo, Nome, Cidade, Idade, Sexo)
 
-retp :: Pessoa
-retp = ("junior", 12)
+cli_arquivo = "cliente.db"
 
-retchar :: Pessoa -> String
-retchar (x, y) = "" ++ x++ show y
+cli = (5,"junior", "floripa", 12, 'M')
 
-rettupla :: String -> Pessoa
-re
-salva = do
-  let string = retchar(retp)
-  writeFile "pessoa.txt" string
-  putStr "ecreveu"
+string_conv :: Cliente -> String
+string_conv (x, y, z, w, k) = "" ++ show x ++ "," ++ y ++ "," ++ z ++ "," ++ show w ++ "," ++ show k ++ "\n"
 
-ler = do
-  contents <- readFile "pessoa.txt"
-  putStr contents
+cli_add = do
+  appendFile cli_arquivo (string_conv cli)
+
+
+--retchar :: Pessoa -> String
+--retchar (x, y) = "" ++ x++ show y
+
+--ret_pessoa :: [String] -> Pessoa
+--ret_pessoa x = (get_pos x 0, get_pos x 1)
+
+--get_pos :: [String] -> Int -> String
+--get_pos [] _ = []
+--get_pos (x:xs) i | i == 0 = x
+--                 | otherwise = get_pos xs (i-1)
+
 
 main:: IO ()
 main = do
-  handle <- openFile "cliente.db" ReadMode
+  handle <- openFile "pessoa.txt" ReadMode
   contents <- hGetLine handle
-  putStr contents
   contents <- hGetLine handle
-  putStr contents
+  putStrLn contents
+  putStrLn (show(splitOn "," contents))
