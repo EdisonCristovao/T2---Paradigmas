@@ -1,7 +1,8 @@
-module Cliente where
+  module Cliente where
 
   import System.IO
   import System.Process
+  import Data.List
 
   type Codigo = Integer
   type Nome = String
@@ -40,9 +41,6 @@ module Cliente where
     op <- getChar
     getChar
     trata_menu op
-    -- if op == '9'
-    --   then return ()
-    --   else menu_cli
 
   trata_menu :: Char -> IO ()
   trata_menu '1' = do
@@ -56,6 +54,8 @@ module Cliente where
     cli_add dados
     return ()
   trata_menu '3' = do
+    dados <- read_arq
+    cli_edit dados
     return ()
   trata_menu '4' = do
     dados <- read_arq
@@ -64,6 +64,29 @@ module Cliente where
   trata_menu _ = do
     return ()
 
+  cli_edit :: Clientes -> IO ()
+  cli_edit dados = do
+    system "clear"
+    putStrLn "---------------Alterar Cliente------------"
+    cli_list dados
+    putStr "Digite o id para alterar: "
+    indice <- getLine
+    nome <- getString "\nDigite o Nome: "
+    cidade <- getString "\nDigite a Cidade: "
+    idade <- getString "\nDigite a Idade: "
+    putStr "\nDigite o Sexo 'M' ou 'F': "
+    sexo <- getChar
+    handle <- openFile cli_arquivo WriteMode
+    hPutStrLn handle (show (editar dados (Cliente (read indice :: Integer) nome cidade (read idade:: Integer) sexo)))
+    hClose handle
+    return ()
+
+  editar :: Clientes -> Cliente -> Clientes
+  editar [] _ = []
+  editar ((Cliente co no ci ida se):xs) (Cliente coA noA ciA idaA seA) | co == coA = ((Cliente co noA ciA idaA seA):xs)
+                                                                       | otherwise = ((Cliente co no ci ida se) : (editar xs (Cliente coA noA ciA idaA seA)))
+
+
   cli_remove :: Clientes -> IO ()
   cli_remove dados = do
     system "clear"
@@ -71,14 +94,16 @@ module Cliente where
     cli_list dados
     putStr "Digite o id para remover: "
     indice <- getLine
-    --newLista <- remove dados (read indice :: Integer)
+    handle <- openFile cli_arquivo WriteMode
+    hPutStrLn handle (show (remove dados (read indice :: Integer)))
+    hClose handle
     return ()
 
-  -- remove :: Clientes -> Integer -> IO Clientes
-  -- remove [] _ = return []
-  -- remove ((Cliente co no ci ida se):xs) indice | co == indice = return (remove xs indice)
-  --                                              | otherwise = return ((Cliente co no ci ida se) : remove xs indice)
-  --
+  remove :: Clientes -> Integer -> Clientes
+  remove [] _ = []
+  remove ((Cliente co no ci ida se):xs) indice | co == indice = xs
+                                               | otherwise = ((Cliente co no ci ida se) : (remove xs indice))
+
 
   get_cod_atual :: Clientes -> IO Integer
   get_cod_atual [] = return 0

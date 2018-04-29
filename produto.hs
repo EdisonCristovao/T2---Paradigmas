@@ -52,9 +52,12 @@ module Produto where
     prod_add dados
     return ()
   trata_menu '3' = do
+    dados <- prod_read_arq
+    prod_edit dados
     return ()
   trata_menu '4' = do
     dados <- prod_read_arq
+    prod_remove dados
     return ()
   trata_menu _ = do
     return ()
@@ -67,6 +70,44 @@ module Produto where
   prod_list (x:xs) = do
     print x
     prod_list xs
+
+  prod_edit :: Produtos -> IO ()
+  prod_edit dados = do
+    system "clear"
+    putStrLn "---------------Alterar Produtos------------"
+    prod_list dados
+    putStr "Digite o id para alterar: "
+    indice <- getLine
+    nome <- getString "\nDigite o Nome: "
+    quantid <- getString "\nDigite a Cidade: "
+    preco <- getString "\nDigite a Idade: "
+    handle <- openFile prod_arquivo WriteMode
+    hPutStrLn handle (show (editar dados (Produto (read indice :: Integer) nome (read quantid :: Integer) (read preco:: Float))))
+    hClose handle
+    return ()
+
+  editar :: Produtos -> Produto -> Produtos
+  editar [] _ = []
+  editar ((Produto co no qt pr):xs) (Produto coA noA qtA prA) | co == coA = ((Produto co noA qtA prA):xs)
+                                                                       | otherwise = ((Produto co no qt pr) : (editar xs (Produto coA noA qtA prA)))
+
+  prod_remove :: Produtos -> IO ()
+  prod_remove dados = do
+    system "clear"
+    putStrLn "---------------Remover Produto------------"
+    prod_list dados
+    putStr "Digite o id para remover: "
+    indice <- getLine
+    handle <- openFile prod_arquivo WriteMode
+    hPutStrLn handle (show (remove dados (read indice :: Integer)))
+    hClose handle
+    return ()
+
+  remove :: Produtos -> Integer -> Produtos
+  remove [] _ = []
+  remove ((Produto co no qt pr):xs) indice | co == indice = xs
+                                           | otherwise = ((Produto co no qt pr) : (remove xs indice))
+
 
   get_cod_atual :: Produtos -> IO Integer
   get_cod_atual [] = return 0
