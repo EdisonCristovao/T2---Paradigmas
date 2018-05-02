@@ -1,8 +1,8 @@
-  module Cliente where
+module Cliente where
 
   import System.IO
   import System.Process
-  import Data.List
+  --import Data.List
 
   type Codigo = Integer
   type Nome = String
@@ -21,8 +21,8 @@
     ret <- getLine
     return ret
 
-  read_arq :: IO Clientes
-  read_arq = do
+  cli_read_arq :: IO Clientes
+  cli_read_arq = do
     handle <- openFile cli_arquivo ReadMode
     dados <- hGetLine handle
     hClose handle
@@ -40,28 +40,28 @@
     putStr "Opção: "
     op <- getChar
     getChar
-    trata_menu op
+    cli_trata_menu op
 
-  trata_menu :: Char -> IO ()
-  trata_menu '1' = do
-    dados <- read_arq
+  cli_trata_menu :: Char -> IO ()
+  cli_trata_menu '1' = do
+    dados <- cli_read_arq
     system "clear"
     putStrLn "---------------Listar Clientes------------\n"
     cli_list dados
     return ()
-  trata_menu '2' = do
-    dados <- read_arq
+  cli_trata_menu '2' = do
+    dados <- cli_read_arq
     cli_add dados
     return ()
-  trata_menu '3' = do
-    dados <- read_arq
+  cli_trata_menu '3' = do
+    dados <- cli_read_arq
     cli_edit dados
     return ()
-  trata_menu '4' = do
-    dados <- read_arq
+  cli_trata_menu '4' = do
+    dados <- cli_read_arq
     cli_remove dados
     return ()
-  trata_menu _ = do
+  cli_trata_menu _ = do
     return ()
 
   cli_edit :: Clientes -> IO ()
@@ -85,8 +85,6 @@
   editar [] _ = []
   editar ((Cliente co no ci ida se):xs) (Cliente coA noA ciA idaA seA) | co == coA = ((Cliente co noA ciA idaA seA):xs)
                                                                        | otherwise = ((Cliente co no ci ida se) : (editar xs (Cliente coA noA ciA idaA seA)))
-
-
   cli_remove :: Clientes -> IO ()
   cli_remove dados = do
     system "clear"
@@ -103,11 +101,9 @@
   remove [] _ = []
   remove ((Cliente co no ci ida se):xs) indice | co == indice = xs
                                                | otherwise = ((Cliente co no ci ida se) : (remove xs indice))
-
-
-  get_cod_atual :: Clientes -> IO Integer
-  get_cod_atual [] = return 0
-  get_cod_atual ((Cliente co no ci ida se):xs) = return co
+  cli_get_cod_atual :: Clientes -> IO Integer
+  cli_get_cod_atual [] = return 0
+  cli_get_cod_atual ((Cliente co no ci ida se):xs) = return co
 
   cli_list  :: Clientes -> IO ()
   cli_list [] = do
@@ -122,7 +118,7 @@
   cli_add dados = do
     system "clear"
     putStrLn "---------------Adicionar Cliente------------"
-    cod <- get_cod_atual dados -- pega o cod do ultima
+    cod <- cli_get_cod_atual dados -- pega o cod do ultima
     nome <- getString "\nDigite o Nome: "
     cidade <- getString "\nDigite a Cidade: "
     idade <- getString "\nDigite a Idade: "
