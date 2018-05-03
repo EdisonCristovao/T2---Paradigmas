@@ -2,16 +2,8 @@ module Cliente where
 
   import System.IO
   import System.Process
-  --import Data.List
-
-  type Codigo = Integer
-  type Nome = String
-  type Cidade = String
-  type Idade = Integer
-  type Sexo = Char
-  type Clientes = [Cliente]
-  data Cliente = Cliente Codigo Nome Cidade Idade Sexo
-                  deriving (Show, Read)
+  --import Venda
+  import DataType
 
   cli_arquivo = "db/cliente.db"
 
@@ -92,6 +84,10 @@ module Cliente where
     cli_list dados
     putStr "Digite o id para remover: "
     indice <- getLine
+    --vendas <- vend_read_arq
+    -- if cli_possui_venda (read indice:: Integer) vendas
+    --   then putStrLn "Cliente possui venda"
+    --   else do
     handle <- openFile cli_arquivo WriteMode
     hPutStrLn handle (show (remove dados (read indice :: Integer)))
     hClose handle
@@ -130,3 +126,9 @@ module Cliente where
     hClose handle
     return ()
   -------------------------------------------------------
+
+
+  is_cliente :: Integer -> Clientes-> Bool
+  is_cliente _ [] = False
+  is_cliente idCli ((Cliente cod nome cidade idade sexo):xs) | cod == idCli = True
+                                                             | otherwise = is_cliente idCli xs

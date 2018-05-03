@@ -4,16 +4,11 @@ module Venda where
   import Data.Time.Calendar
   import System.IO
   import System.Process
-  import Cliente
-  import ItemVenda
 
-  type Codigo_cliente = Integer
-  type Dia = String
-  type Mes = String
-  type Ano = String
-  type Vendas = [Venda]
-  data Venda = Venda Codigo_venda Codigo_cliente Dia Mes Ano
-                deriving(Show, Read)
+  import ItemVenda
+  import Cliente
+  import Produto
+  import DataType
 
   vend_arquivo = "db/venda.db"
 
@@ -47,9 +42,16 @@ module Venda where
     return ()
   vend_trata_menu '2' = do
     id_cli <- get_cliente -- pega o id do cliente
-    dados <- vend_read_arq -- pega vendas
-    system "clear"
-    realizar_venda dados id_cli
+    clientes <- cli_read_arq
+    if (is_cliente id_cli clientes)
+      then do
+        dados <- vend_read_arq -- pega vendas
+        system "clear"
+        realizar_venda dados id_cli
+      else do
+        putStrLn "Cliente nao existe (ENTER PARA SAIR)"
+        getLine
+        return ()
     return ()
 
   vend_get_cod_atual :: Vendas -> IO Integer
@@ -62,9 +64,9 @@ module Venda where
     now <- getCurrentTime
     let (year, month, day) = toGregorian $ utctDay now
     -- chamar cadastro de produtos
-    menu_item (cod+1)
+    menu_item (cod+1) []
     handle <- openFile vend_arquivo WriteMode
-    hPutStrLn handle (show((Venda (cod+1) id_cli (show day) (show month) (show year)):dados))
+    hPutStrLn handle (show((Venda (cod+1) id_cli (read (show day):: Integer) (read (show month):: Integer) (read (show year):: Integer)):dados))
     hClose handle
     return ()
 
@@ -86,3 +88,8 @@ module Venda where
     putStr "Digite o Id do cliente: "
     id_cliente <- getLine
     return (read id_cliente:: Integer)
+
+  -- cli_possui_venda :: Integer -> Vendas -> Bool
+  -- cli_possui_venda _ [] = False
+  -- cli_possui_venda cod_cli ((Venda cod idc day month year):xs) | cod_cli == idc = True
+  --                                                              | otherwise = cli_possui_venda cod_cli xs

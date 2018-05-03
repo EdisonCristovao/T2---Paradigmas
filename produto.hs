@@ -2,14 +2,7 @@ module Produto where
 
   import System.IO
   import System.Process
-
-  type Codigo = Integer
-  type Nome = String
-  type Quantidade = Integer
-  type Preco = Float
-  type Produtos = [Produto]
-  data Produto = Produto Codigo Nome Quantidade Preco
-                deriving (Show, Read)
+  import DataType
 
   prod_arquivo = "db/produto.db"
 
@@ -128,3 +121,13 @@ module Produto where
     hPutStrLn handle (show ((Produto (cod + 1) nome (read quantid :: Integer) (read preco:: Float)):dados))
     hClose handle
     return ()
+
+  get_preco :: Integer -> Produtos -> IO Preco
+  get_preco _ [] = return 0
+  get_preco cod_pro ((Produto co no qt pr):xs) | cod_pro == co = return pr
+                                              | otherwise = get_preco cod_pro xs
+
+  get_qtd :: Integer -> Produtos -> IO Quantidade
+  get_qtd _ [] = return 0
+  get_qtd cod_pro ((Produto co no qt pr):xs) | cod_pro == co = return qt
+                                              | otherwise = get_qtd cod_pro xs
