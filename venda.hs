@@ -2,22 +2,14 @@ module Venda where
 
   import Data.Time.Clock
   import Data.Time.Calendar
-  import System.IO
   import System.Process
+  import System.IO
 
   import ItemVenda
   import Cliente
   import Produto
   import DataType
 
-  vend_arquivo = "db/venda.db"
-
-  vend_read_arq :: IO Vendas
-  vend_read_arq = do
-    handle <- openFile vend_arquivo ReadMode
-    dados <- hGetLine handle
-    hClose handle
-    return (read dados)
 
   menu_vend :: IO ()
   menu_vend = do

@@ -5,7 +5,6 @@ module ItemVenda where
   import DataType
   import Produto
 
-  item_arquivo = "db/itemvenda.db"
 
   item_read_arq :: IO ItemVendas
   item_read_arq = do
@@ -64,8 +63,14 @@ module ItemVenda where
         preco <- get_preco (read cod_prod :: Integer) produtos
         putStr "Digite o percentual de desconto do produto: "
         desc_prod <- getLine
-        let total = preco * (read qtd_prod :: Float)
-        menu_item cod_vend ((ItemVenda cod_vend 2 (read cod_prod :: Integer) preco (read desc_prod :: Integer) (read qtd_prod :: Integer) total) :items)
+        if ((read desc_prod :: Integer) <= 10) && ((read desc_prod :: Integer) >= 0)
+          then do
+            let total = (preco * (read qtd_prod :: Float)*((read desc_prod :: Float)/(-100.0)+1.0))
+            menu_item cod_vend ((ItemVenda cod_vend 2 (read cod_prod :: Integer) preco (read desc_prod :: Integer) (read qtd_prod :: Integer) total) :items)
+          else do
+            putStrLn "Desconto invalido (ENTER PARA CONTINUAR)"
+            getLine
+            menu_item cod_vend items
       else do
         putStrLn "Produto nao existe ou quantidade invalida (ENTER PARA CONTINUAR)"
         getLine

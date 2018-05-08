@@ -4,7 +4,6 @@ module Produto where
   import System.Process
   import DataType
 
-  prod_arquivo = "db/produto.db"
 
   getString :: String -> IO String
   getString str = do
@@ -131,3 +130,11 @@ module Produto where
   get_qtd _ [] = return 0
   get_qtd cod_pro ((Produto co no qt pr):xs) | cod_pro == co = return qt
                                               | otherwise = get_qtd cod_pro xs
+
+  -- prepara_baixa_estoque :: ItemVendas -> Produtos -> IO Produtos
+  -- prepara_baixa_estoque [] _ = return []
+  -- prepara_baixa_estoque (item:ws) produtos = baixa_qtd item
+  --
+  -- baixa_qtd :: ItemVenda -> Produtos -> Produtos
+  -- baixa_qtd (ItemVenda codV codiV codpV precV descV qtdV totV) ((Produto cod nome qtd preco):xs) | codpV == cod = ((Produto cod nome qtd preco):xs)
+  --                                                                                                | otherwise = (Produto cod nome qtd preco) : (baixa_qtd (ItemVenda codV codiV codpV precV descV qtdV totV) xs)

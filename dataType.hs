@@ -1,5 +1,7 @@
 module DataType where
 
+  import System.IO
+
   type Codigo = Integer
   type Cidade = String
   type Idade = Integer
@@ -32,3 +34,15 @@ module DataType where
   type Vendas = [Venda]
   data Venda = Venda Codigo_venda Codigo_cliente Dia Mes Ano
                 deriving (Show, Read)
+
+  item_arquivo = "db/itemvenda.db"
+  prod_arquivo = "db/produto.db"
+  cli_arquivo = "db/cliente.db"
+  vend_arquivo = "db/venda.db"
+
+  vend_read_arq :: IO Vendas
+  vend_read_arq = do
+    handle <- openFile vend_arquivo ReadMode
+    dados <- hGetLine handle
+    hClose handle
+    return (read dados)

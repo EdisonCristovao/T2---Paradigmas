@@ -5,7 +5,6 @@ module Cliente where
   --import Venda
   import DataType
 
-  cli_arquivo = "db/cliente.db"
 
   getString :: String -> IO String
   getString str = do
@@ -28,6 +27,7 @@ module Cliente where
     putStrLn "Digite 2 para cadastrar Cliente"
     putStrLn "Digite 3 para alterar Cliente"
     putStrLn "Digite 4 para remover Cliente"
+    putStrLn "Digite 5 para listar compras do Cliente"
     --outras opçoes em breve
     putStr "Opção: "
     op <- getChar
@@ -52,6 +52,12 @@ module Cliente where
   cli_trata_menu '4' = do
     dados <- cli_read_arq
     cli_remove dados
+    return ()
+  cli_trata_menu '5' = do
+    dados <- cli_read_arq
+    system "clear"
+    putStrLn "---------------Listar Clientes------------\n"
+    cli_list_vend dados
     return ()
   cli_trata_menu _ = do
     return ()
@@ -132,3 +138,31 @@ module Cliente where
   is_cliente _ [] = False
   is_cliente idCli ((Cliente cod nome cidade idade sexo):xs) | cod == idCli = True
                                                              | otherwise = is_cliente idCli xs
+
+  cli_list_vend :: Clientes -> IO ()
+  cli_list_vend dados = do
+    system "clear"
+    putStrLn "---------------Lista Vendas Cliente------------"
+    cli_list dados
+    putStr "Digite o id para listar: "
+    indice <- getLine
+    vendas <- vend_read_arq
+    let vendas_cli = get_vendas (read indice :: Integer) vendas
+    vend_list_cli vendas_cli 0
+    return ()
+
+  get_vendas :: Integer -> Vendas -> Vendas
+  get_vendas _ [] = []
+  get_vendas indice ((Venda co co_c dia mes ano):xs) | co_c == indice = ((Venda co co_c dia mes ano): (get_vendas indice xs))
+                                                     | otherwise = get_vendas indice xs
+
+  vend_list_cli  :: Vendas -> Float -> IO ()
+  vend_list_cli [] total = do
+    putStrLn "Total das vendas " + (show total)
+    putStr "\nAperte ENTER para continuar"
+    getLine
+    return ()
+  vend_list_cli (x:xs) = do
+    print x
+    putStrLn (getTotal x)
+    vend_list_cli xs
