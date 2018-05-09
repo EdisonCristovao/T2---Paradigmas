@@ -2,7 +2,6 @@ module Cliente where
 
   import System.IO
   import System.Process
-  --import Venda
   import DataType
 
 
@@ -148,7 +147,7 @@ module Cliente where
     indice <- getLine
     vendas <- vend_read_arq
     let vendas_cli = get_vendas (read indice :: Integer) vendas
-    vend_list_cli vendas_cli 0
+    vend_list_cli vendas_cli
     return ()
 
   get_vendas :: Integer -> Vendas -> Vendas
@@ -156,13 +155,25 @@ module Cliente where
   get_vendas indice ((Venda co co_c dia mes ano):xs) | co_c == indice = ((Venda co co_c dia mes ano): (get_vendas indice xs))
                                                      | otherwise = get_vendas indice xs
 
-  vend_list_cli  :: Vendas -> Float -> IO ()
-  vend_list_cli [] total = do
-    putStrLn "Total das vendas " + (show total)
+  vend_list_cli  :: Vendas -> IO ()
+  vend_list_cli [] = do
     putStr "\nAperte ENTER para continuar"
     getLine
     return ()
   vend_list_cli (x:xs) = do
     print x
-    putStrLn (getTotal x)
+    total <- (getTotal x)
+    putStrLn (show total)
     vend_list_cli xs
+
+  getTotal :: Venda -> IO Float
+  getTotal (Venda co co_c dia mes ano) = do
+    itens <- item_read_arq
+    let total = getTotalPorIdVenda itens co
+    return total
+
+
+  getTotalPorIdVenda :: ItemVendas -> Integer -> Float
+  getTotalPorIdVenda [] _ = 0
+  getTotalPorIdVenda ((ItemVenda cod_v cod_i cod_p pre desc_p qtd total):xs) cod | cod == cod_v = (total + getTotalPorIdVenda xs cod_v)
+                                                                                 | otherwise = getTotalPorIdVenda xs cod_v

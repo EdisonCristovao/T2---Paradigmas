@@ -46,3 +46,11 @@ module DataType where
     dados <- hGetLine handle
     hClose handle
     return (read dados)
+
+
+  item_read_arq :: IO ItemVendas
+  item_read_arq = do
+    handle <- openFile item_arquivo ReadMode
+    dados <- hGetLine handle
+    hClose handle
+    return (read dados)

@@ -6,12 +6,6 @@ module ItemVenda where
   import Produto
 
 
-  item_read_arq :: IO ItemVendas
-  item_read_arq = do
-    handle <- openFile item_arquivo ReadMode
-    dados <- hGetLine handle
-    hClose handle
-    return (read dados)
 
   menu_item :: Integer -> ItemVendas -> IO ()
   menu_item cod_venda items = do
