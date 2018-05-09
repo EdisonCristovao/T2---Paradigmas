@@ -7,8 +7,8 @@ B - falta baixar do estoque
 C - OK
 D - OK ps: nao mostra o sexo como MASCULINO OU FEMININO
 E -
-F - falta o total vendido ao clientes
+F - ok
 G -
 H -
-I -
+I - ok
 J -
