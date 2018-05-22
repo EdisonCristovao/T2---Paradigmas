@@ -89,14 +89,24 @@ module Cliente where
     cli_list dados
     putStr "Digite o id para remover: "
     indice <- getLine
-    --vendas <- vend_read_arq
-    -- if cli_possui_venda (read indice:: Integer) vendas
-    --   then putStrLn "Cliente possui venda"
-    --   else do
-    handle <- openFile cli_arquivo WriteMode
-    hPutStrLn handle (show (remove dados (read indice :: Integer)))
-    hClose handle
+    vendas <- vend_read_arq
+    possuiCli <- cli_possui_venda (read indice:: Integer) vendas
+    if possuiCli
+       then do
+         putStrLn "Cliente possui venda"
+         getLine
+         return ()
+       else do
+         handle <- openFile cli_arquivo WriteMode
+         hPutStrLn handle (show (remove dados (read indice :: Integer)))
+         hClose handle
+         return ()
     return ()
+
+  cli_possui_venda :: Integer -> Vendas -> IO Bool
+  cli_possui_venda _ [] = return False
+  cli_possui_venda indice ((Venda co co_c dia mes ano):xs) | indice == co_c = return  True
+                                                   | otherwise = cli_possui_venda indice xs
 
   remove :: Clientes -> Integer -> Clientes
   remove [] _ = []
