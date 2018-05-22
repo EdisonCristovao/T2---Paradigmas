@@ -54,3 +54,15 @@ module DataType where
     dados <- hGetLine handle
     hClose handle
     return (read dados)
+
+  getTotal :: Venda -> IO Float
+  getTotal (Venda co co_c dia mes ano) = do
+    itens <- item_read_arq
+    let total = getTotalPorIdVenda itens co
+    return total
+
+
+  getTotalPorIdVenda :: ItemVendas -> Integer -> Float
+  getTotalPorIdVenda [] _ = 0
+  getTotalPorIdVenda ((ItemVenda cod_v cod_i cod_p pre desc_p qtd total):xs) cod | cod == cod_v = (total + getTotalPorIdVenda xs cod_v)
+                                                                                 | otherwise = getTotalPorIdVenda xs cod_v
