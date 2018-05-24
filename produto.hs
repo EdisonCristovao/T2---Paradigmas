@@ -71,8 +71,8 @@ module Produto where
     putStr "Digite o id para alterar: "
     indice <- getLine
     nome <- getString "\nDigite o Nome: "
-    quantid <- getString "\nDigite a Cidade: "
-    preco <- getString "\nDigite a Idade: "
+    quantid <- getString "\nDigite a quantidade: "
+    preco <- getString "\nDigite o preco: "
     handle <- openFile prod_arquivo WriteMode
     hPutStrLn handle (show (editar dados (Produto (read indice :: Integer) nome (read quantid :: Integer) (read preco:: Float))))
     hClose handle
@@ -90,10 +90,20 @@ module Produto where
     prod_list dados
     putStr "Digite o id para remover: "
     indice <- getLine
-    handle <- openFile prod_arquivo WriteMode
-    hPutStrLn handle (show (remove dados (read indice :: Integer)))
-    hClose handle
+    items <- item_read_arq
+    possuiItem <- prod_possui_venda (read indice :: Integer) items
+    if possuiItem
+      then do
+        putStrLn "Produto possui venda"
+        getLine
+        return ()
+      else do
+        handle <- openFile prod_arquivo WriteMode
+        hPutStrLn handle (show (remove dados (read indice :: Integer)))
+        hClose handle
+        return ()
     return ()
+
 
   remove :: Produtos -> Integer -> Produtos
   remove [] _ = []

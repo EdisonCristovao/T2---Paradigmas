@@ -116,8 +116,12 @@ module Cliente where
     putStr "\nAperte ENTER para continuar"
     getLine
     return ()
-  cli_list (x:xs) = do
-    print x
+  cli_list ((Cliente co no ci ida se):xs) = do
+    if se == 'M' || se == 'm'
+      then do
+        putStrLn ("Codigo: " ++ (show co) ++ ", Nome: " ++ (show no) ++ ", Cidade: " ++ (show ci) ++ ", Idade: " ++ (show ida) ++ ", Sexo: Masculino")
+      else do
+        putStrLn ("Codigo: " ++ (show co) ++ ", Nome: " ++ (show no) ++ ", Cidade: " ++ (show ci) ++ ", Idade: " ++ (show ida) ++ ", Sexo: Feminino")
     cli_list xs
 
   cli_add :: Clientes -> IO ()
@@ -170,5 +174,3 @@ module Cliente where
     total <- (getTotal x)
     putStrLn (show total)
     vend_list_cli xs
-
-  

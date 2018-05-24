@@ -76,6 +76,17 @@ module Venda where
     print x
     vend_list xs
 
+  vend_list_client  :: Vendas -> IO ()
+  vend_list_client [] = do
+    putStr "\nAperte ENTER para continuar"
+    getLine
+    return ()
+  vend_list_client (x:xs) = do
+    total <- getTotal x
+    print x
+    print ("Total: " ++ show total)
+    vend_list_client xs
+
   get_cliente :: IO Integer
   get_cliente = do
     system "clear"
@@ -108,17 +119,17 @@ module Venda where
     ano_final <- getLine
     vendas <- vend_read_arq
     let vendas_periodo = get_vendas_periodo (read dia_inicial :: Integer) (read mes_inicial :: Integer) (read ano_inicial :: Integer) (read dia_final :: Integer) (read mes_final :: Integer) (read ano_final :: Integer) vendas
-    vend_list vendas_periodo
+    vend_list_cli vendas_periodo
     return ()
-  
+
   -- Dia Inicial -> Mes Inicial -> Ano inicial -> Dia Final -> Mes Final -> Ano Final
   get_vendas_periodo :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Vendas -> Vendas
   get_vendas_periodo _ _ _ _ _ _ [] = []
   get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final ((Venda co co_c dia mes ano):xs)
     | dia_inicial <= dia && mes_inicial <= mes && ano_inicial <= ano && dia_final >= dia && mes_final >= mes && ano_final >= ano = ((Venda co co_c dia mes ano) : (get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs))
-    | otherwise = get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs  
+    | otherwise = get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs
 
-  relatorio_cliente :: IO () 
+  relatorio_cliente :: IO ()
   relatorio_cliente = do
     putStrLn "Digite o ID do cliente: "
     id_cli <- getLine
@@ -161,5 +172,5 @@ module Venda where
       else do
         putStrLn ("Total da venda :" ++ (show cod_vend) ++ " não está igual ao banco")
     else do
-      get_itens_venda cod_v xs 
+      get_itens_venda cod_v xs
       return ()
