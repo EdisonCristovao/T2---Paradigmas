@@ -17,11 +17,8 @@ module Venda where
     putStrLn "---------------Menu Vendas------------"
     putStrLn "\nDigite 1 para listar Vendas"
     putStrLn "Digite 2 para cadastrar Vendas"
-    --putStrLn "Digite 3 para alterar Vendas"
-    --putStrLn "Digite 4 para remover Vendas"
     putStrLn "Digite 5 para relatorio por periodo"
     putStrLn "Digite 6 para relatorio por cliente"
-    --outras opçoes em breve
     putStr "Opção: "
     op <- getChar
     getChar
@@ -49,10 +46,6 @@ module Venda where
     return ()
   vend_trata_menu '5' = do
     relatorio_periodo
-    return ()
-  vend_trata_menu '6' = do
-    clientes <- cli_read_arq
-    relatorio_cliente
     return ()
 
   vend_get_cod_atual :: Vendas -> IO Integer
@@ -95,16 +88,6 @@ module Venda where
   -- cli_possui_venda cod_cli ((Venda cod idc day month year):xs) | cod_cli == idc = True
   --                                                              | otherwise = cli_possui_venda cod_cli xs
 
-
-  relatorio_cliente :: IO () 
-  relatorio_cliente = do
-    putStrLn "Digite o ID do cliente: "
-    id_cli <- getLine
-    vendas <- vend_read_arq
-    let vendas_cliente = get_vendas_cliente (read id_cli :: Integer) vendas
-    vend_list vendas_cliente
-    return ()
-
   relatorio_periodo :: IO ()
   relatorio_periodo = do
     putStrLn "\nDigite o dia inicial: "
@@ -130,6 +113,47 @@ module Venda where
   get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final ((Venda co co_c dia mes ano):xs)
     | dia_inicial <= dia && mes_inicial <= mes && ano_inicial <= ano && dia_final >= dia && mes_final >= mes && ano_final >= ano = ((Venda co co_c dia mes ano) : (get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs))
     | otherwise = get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs  
+
+
+  coerencia_de_vendas :: Vendas -> IO ()
+  coerencia_de_vendas [] = do
+    getLine
+    return ()
+  coerencia_de_vendas ((Venda co co_c dia mes ano):xs) = do
+    dados_cli <- cli_read_arq
+    possuiCli <- venda_possui_cli co_c dados_cli
+    if possuiCli
+      then do
+        putStrLn ("Venda :" ++ (show co) ++ " possui um cliente na base")
+        return()
+      else do
+        putStrLn ("Venda :" ++ (show co) ++ " não possui um cliente na base")
+        return()
+    items <- item_read_arq
+    get_itens_venda co items
+    coerencia_de_vendas xs
+
+  get_itens_venda :: Integer -> ItemVendas -> IO ()
+  get_itens_venda _ [] = return ()
+  get_itens_venda cod_v ((ItemVenda cod_vend cod_i cod_prod preco desc_prod qtd_prod total):xs) = do
+    if cod_v == cod_vend then do
+      let tot = (preco * (read (show qtd_prod) :: Float)*((read (show desc_prod) :: Float)/(-100.0)+1.0))
+      if tot == total then do
+        putStrLn ("Total da venda :" ++ (show cod_vend) ++ " está igual ao banco")
+      else do
+        putStrLn ("Total da venda :" ++ (show cod_vend) ++ " não está igual ao banco")
+    else do
+      get_itens_venda cod_v xs 
+      return ()
+
+  relatorio_cliente :: IO () 
+  relatorio_cliente = do
+    putStrLn "Digite o ID do cliente: "
+    id_cli <- getLine
+    vendas <- vend_read_arq
+    let vendas_cliente = get_vendas_cliente (read id_cli :: Integer) vendas
+    vend_list vendas_cliente
+    return ()
 
   get_vendas_cliente :: Integer -> Vendas -> Vendas
   get_vendas_cliente _ [] = []
