@@ -19,6 +19,7 @@ module Venda where
     putStrLn "Digite 2 para cadastrar Vendas"
     --putStrLn "Digite 3 para alterar Vendas"
     --putStrLn "Digite 4 para remover Vendas"
+    putStrLn "Digite 5 para relatorio por periodo"
     --outras opçoes em breve
     putStr "Opção: "
     op <- getChar
@@ -44,6 +45,9 @@ module Venda where
         putStrLn "Cliente nao existe (ENTER PARA SAIR)"
         getLine
         return ()
+    return ()
+  vend_trata_menu '5' = do
+    relatorio_periodo
     return ()
 
   vend_get_cod_atual :: Vendas -> IO Integer
@@ -85,3 +89,30 @@ module Venda where
   -- cli_possui_venda _ [] = False
   -- cli_possui_venda cod_cli ((Venda cod idc day month year):xs) | cod_cli == idc = True
   --                                                              | otherwise = cli_possui_venda cod_cli xs
+
+
+  relatorio_periodo :: IO ()
+  relatorio_periodo = do
+    putStrLn "\nDigite o dia inicial: "
+    dia_inicial <- getLine
+    putStrLn "\nDigite o mes inicial:"
+    mes_inicial <- getLine
+    putStrLn "\nDigite o ano inicial:"
+    ano_inicial <- getLine
+    putStrLn "\nDigite o dia final: "
+    dia_final <- getLine
+    putStrLn "\nDigite o mes final:"
+    mes_final <- getLine
+    putStrLn "\nDigite o ano final:"
+    ano_final <- getLine
+    vendas <- vend_read_arq
+    let vendas_periodo = get_vendas_periodo (read dia_inicial :: Integer) (read mes_inicial :: Integer) (read ano_inicial :: Integer) (read dia_final :: Integer) (read mes_final :: Integer) (read ano_final :: Integer) vendas
+    vend_list vendas_periodo
+    return ()
+  
+  -- Dia Inicial -> Mes Inicial -> Ano inicial -> Dia Final -> Mes Final -> Ano Final
+  get_vendas_periodo :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Vendas -> Vendas
+  get_vendas_periodo _ _ _ _ _ _ [] = []
+  get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final ((Venda co co_c dia mes ano):xs)
+    | dia_inicial <= dia && mes_inicial <= mes && ano_inicial <= ano && dia_final >= dia && mes_final >= mes && ano_final >= ano = ((Venda co co_c dia mes ano) : (get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs))
+    | otherwise = get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs  
