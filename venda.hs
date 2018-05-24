@@ -20,6 +20,7 @@ module Venda where
     --putStrLn "Digite 3 para alterar Vendas"
     --putStrLn "Digite 4 para remover Vendas"
     putStrLn "Digite 5 para relatorio por periodo"
+    putStrLn "Digite 6 para relatorio por cliente"
     --outras opçoes em breve
     putStr "Opção: "
     op <- getChar
@@ -48,6 +49,10 @@ module Venda where
     return ()
   vend_trata_menu '5' = do
     relatorio_periodo
+    return ()
+  vend_trata_menu '6' = do
+    clientes <- cli_read_arq
+    relatorio_cliente
     return ()
 
   vend_get_cod_atual :: Vendas -> IO Integer
@@ -91,6 +96,15 @@ module Venda where
   --                                                              | otherwise = cli_possui_venda cod_cli xs
 
 
+  relatorio_cliente :: IO () 
+  relatorio_cliente = do
+    putStrLn "Digite o ID do cliente: "
+    id_cli <- getLine
+    vendas <- vend_read_arq
+    let vendas_cliente = get_vendas_cliente (read id_cli :: Integer) vendas
+    vend_list vendas_cliente
+    return ()
+
   relatorio_periodo :: IO ()
   relatorio_periodo = do
     putStrLn "\nDigite o dia inicial: "
@@ -116,3 +130,9 @@ module Venda where
   get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final ((Venda co co_c dia mes ano):xs)
     | dia_inicial <= dia && mes_inicial <= mes && ano_inicial <= ano && dia_final >= dia && mes_final >= mes && ano_final >= ano = ((Venda co co_c dia mes ano) : (get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs))
     | otherwise = get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs  
+
+  get_vendas_cliente :: Integer -> Vendas -> Vendas
+  get_vendas_cliente _ [] = []
+  get_vendas_cliente id ((Venda co co_c dia mes ano):xs)
+    | id == co_c = ((Venda co co_c dia mes ano) : (get_vendas_cliente id xs))
+    | otherwise = get_vendas_cliente id xs
