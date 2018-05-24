@@ -18,6 +18,7 @@ module Venda where
     putStrLn "\nDigite 1 para listar Vendas"
     putStrLn "Digite 2 para cadastrar Vendas"
     putStrLn "Digite 5 para relatorio por periodo"
+    putStrLn "Digite 6 para relatorio por cliente"
     putStr "Opção: "
     op <- getChar
     getChar
@@ -45,6 +46,9 @@ module Venda where
     return ()
   vend_trata_menu '5' = do
     relatorio_periodo
+    return ()
+  vend_trata_menu '6' = do
+    relatorio_cliente
     return ()
 
   vend_get_cod_atual :: Vendas -> IO Integer
@@ -114,6 +118,20 @@ module Venda where
     | dia_inicial <= dia && mes_inicial <= mes && ano_inicial <= ano && dia_final >= dia && mes_final >= mes && ano_final >= ano = ((Venda co co_c dia mes ano) : (get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs))
     | otherwise = get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs  
 
+  relatorio_cliente :: IO () 
+  relatorio_cliente = do
+    putStrLn "Digite o ID do cliente: "
+    id_cli <- getLine
+    vendas <- vend_read_arq
+    let vendas_cliente = get_vendas_cliente (read id_cli :: Integer) vendas
+    vend_list vendas_cliente
+    return ()
+
+  get_vendas_cliente :: Integer -> Vendas -> Vendas
+  get_vendas_cliente _ [] = []
+  get_vendas_cliente id ((Venda co co_c dia mes ano):xs)
+    | id == co_c = ((Venda co co_c dia mes ano) : (get_vendas_cliente id xs))
+    | otherwise = get_vendas_cliente id xs
 
   coerencia_de_vendas :: Vendas -> IO ()
   coerencia_de_vendas [] = do
