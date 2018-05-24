@@ -1,14 +1,12 @@
 # T2---Paradigmas
 Sistema de venda em Haskell, trabalho 2 de Paradigmas de Programação
 
-Questões resolvidas
-A - falta regra de exclusão
-B - falta baixar do estoque
-C - OK
-D - OK ps: nao mostra o sexo como MASCULINO OU FEMININO
-E -
-F - ok
-G -
-H -
-I - ok
-J -
+Compilando e executando o programa.
+
+Para compilar o programa usamos o GHCI com o seguinte comando.
+
+```:l main.hs produto.hs venda.hs cliente.hs itensDeVenda.hs dataType.hs```
+
+Em seguida executamos o programa com o comando 
+
+```main```

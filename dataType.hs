@@ -66,3 +66,13 @@ module DataType where
   getTotalPorIdVenda [] _ = 0
   getTotalPorIdVenda ((ItemVenda cod_v cod_i cod_p pre desc_p qtd total):xs) cod | cod == cod_v = (total + getTotalPorIdVenda xs cod_v)
                                                                                  | otherwise = getTotalPorIdVenda xs cod_v
+
+  cli_possui_venda :: Integer -> Vendas -> IO Bool
+  cli_possui_venda _ [] = return False
+  cli_possui_venda indice ((Venda co co_c dia mes ano):xs) | indice == co_c = return  True
+                                                    | otherwise = cli_possui_venda indice xs
+
+  venda_possui_cli :: Integer -> Clientes -> IO Bool
+  venda_possui_cli _ [] = return False
+  venda_possui_cli co_c ((Cliente cod nome cidade idade sexo):xs) | co_c == cod = return True
+                                                                  | otherwise = venda_possui_cli co_c xs

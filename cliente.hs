@@ -103,11 +103,6 @@ module Cliente where
          return ()
     return ()
 
-  cli_possui_venda :: Integer -> Vendas -> IO Bool
-  cli_possui_venda _ [] = return False
-  cli_possui_venda indice ((Venda co co_c dia mes ano):xs) | indice == co_c = return  True
-                                                   | otherwise = cli_possui_venda indice xs
-
   remove :: Clientes -> Integer -> Clientes
   remove [] _ = []
   remove ((Cliente co no ci ida se):xs) indice | co == indice = xs

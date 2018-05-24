@@ -17,10 +17,7 @@ module Venda where
     putStrLn "---------------Menu Vendas------------"
     putStrLn "\nDigite 1 para listar Vendas"
     putStrLn "Digite 2 para cadastrar Vendas"
-    --putStrLn "Digite 3 para alterar Vendas"
-    --putStrLn "Digite 4 para remover Vendas"
     putStrLn "Digite 5 para relatorio por periodo"
-    --outras opçoes em breve
     putStr "Opção: "
     op <- getChar
     getChar
@@ -116,3 +113,35 @@ module Venda where
   get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final ((Venda co co_c dia mes ano):xs)
     | dia_inicial <= dia && mes_inicial <= mes && ano_inicial <= ano && dia_final >= dia && mes_final >= mes && ano_final >= ano = ((Venda co co_c dia mes ano) : (get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs))
     | otherwise = get_vendas_periodo dia_inicial mes_inicial ano_inicial dia_final mes_final ano_final xs  
+
+
+  coerencia_de_vendas :: Vendas -> IO ()
+  coerencia_de_vendas [] = do
+    getLine
+    return ()
+  coerencia_de_vendas ((Venda co co_c dia mes ano):xs) = do
+    dados_cli <- cli_read_arq
+    possuiCli <- venda_possui_cli co_c dados_cli
+    if possuiCli
+      then do
+        putStrLn ("Venda :" ++ (show co) ++ " possui um cliente na base")
+        return()
+      else do
+        putStrLn ("Venda :" ++ (show co) ++ " não possui um cliente na base")
+        return()
+    items <- item_read_arq
+    get_itens_venda co items
+    coerencia_de_vendas xs
+
+  get_itens_venda :: Integer -> ItemVendas -> IO ()
+  get_itens_venda _ [] = return ()
+  get_itens_venda cod_v ((ItemVenda cod_vend cod_i cod_prod preco desc_prod qtd_prod total):xs) = do
+    if cod_v == cod_vend then do
+      let tot = (preco * (read (show qtd_prod) :: Float)*((read (show desc_prod) :: Float)/(-100.0)+1.0))
+      if tot == total then do
+        putStrLn ("Total da venda :" ++ (show cod_vend) ++ " está igual ao banco")
+      else do
+        putStrLn ("Total da venda :" ++ (show cod_vend) ++ " não está igual ao banco")
+    else do
+      get_itens_venda cod_v xs 
+      return ()
